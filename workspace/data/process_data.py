@@ -68,11 +68,11 @@ def clean_data(df):
     ### Convert category values to just numbers 0 or 1
     for column in categories:
     # set each value to be the last character of the string
-    categories[column] = categories[column].str[-1:]
+        categories[column] = categories[column].str[-1:]
     # convert column from string to numeric
-    categories[column] = categories[column].astype('int') 
+        categories[column] = categories[column].astype('int') 
     # Convert all value into binary (0 or 1)
-    categories = (categories > 0).astype(int)
+        categories = (categories > 0).astype(int)
     # ### 5. Replace `categories` column in `df` with new category columns. 
     # drop the original categories column from `df`
     df = df.drop(columns = 'categories')
