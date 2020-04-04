@@ -9,6 +9,7 @@
 # - Load `categories.csv` into a dataframe and inspect the first few lines.
 
 # import libraries
+import sys
 import pandas as pd
 from sqlalchemy import create_engine
 
