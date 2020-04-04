@@ -23,20 +23,12 @@ def load_data(messages_filepath, categories_filepath):
        pandas.DataFrame
     """
     # load messages dataset
-    if os.path.exists(messages_filepath):
-        messages = pd.read_csv(messages_filepath)
-    else:
-        messages = pd.read_csv(messages_filepath + '.gz', compression='gzip')
-
+    messages = pd.read_csv(messages_filepath)
     # load categories dataset
-    if os.path.exists(categories_filepath):
-        categories = pd.read_csv(categories_filepath)
-    else:
-        categories = pd.read_csv(categories_filepath + '.gz', compression='gzip')
-
+    categories = pd.read_csv(categories_filepath)
     #  Merge datasets on ID
     df = messages.merge(categories, on = 'id')
-
+    return df
 
 # ### 3. Split `categories` into separate category columns.
 # - Split the values in the `categories` column on the `;` character so that each value becomes a separate column. 
@@ -72,7 +64,7 @@ def clean_data(df):
     # convert column from string to numeric
         categories[column] = categories[column].astype('int') 
     # Convert all value into binary (0 or 1)
-        categories = (categories > 0).astype(int)
+        categories[column] = categories[column].astype(int)
     # ### 5. Replace `categories` column in `df` with new category columns. 
     # drop the original categories column from `df`
     df = df.drop(columns = 'categories')
