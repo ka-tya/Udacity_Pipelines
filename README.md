@@ -29,16 +29,17 @@ ________________________________________________________________________________
 * pickle
 
 ## Files
-ETL Pipeline Preparation.ipynb: Description for workspace/data/process_data.py
-ML Pipeline Preparation.ipynb: Description for workspace/model/train_classifier.py
-workspace/data/process_data.py: A script that preps and stores the data through the following steps:
-** Load the messages and categories datasets
-** Clean the data
-** Store output in a database
-workspace/model/train_classifier.py: A script that processes and classifies text into categories through the following steps:
-** Load data from the SQLite database
-** Split the dataset into training and test sets
-** Build a text cleansing and machine learning pipeline
-** Tune a model using GridSearchCV
-** Apply results on the test set
-** Exports the final model as a pickle file
+- ETL Pipeline Preparation.ipynb: Description for workspace/data/process_data.py
+- ML Pipeline Preparation.ipynb: Description for workspace/model/train_classifier.py
+
+##### workspace/data/process_data.py: A script that preps and stores the data through the following steps:
+* Load the messages and categories datasets
+* Clean the data
+* Store output in a database
+##### workspace/model/train_classifier.py: A script that processes and classifies text into categories through the following steps:
+* Load data from the SQLite database
+* Split the dataset into training and test sets
+* Build a text cleansing and machine learning pipeline
+* Tune a model using GridSearchCV
+* Apply results on the test set
+* Exports the final model as a pickle file
