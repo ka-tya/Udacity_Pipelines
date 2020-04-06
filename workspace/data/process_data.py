@@ -1,3 +1,4 @@
+import sys
 #!/usr/bin/env python
 # coding: utf-8
 
@@ -9,7 +10,6 @@
 # - Load `categories.csv` into a dataframe and inspect the first few lines.
 
 # import libraries
-import sys
 import pandas as pd
 from sqlalchemy import create_engine
 
@@ -24,8 +24,11 @@ def load_data(messages_filepath, categories_filepath):
     """
     # load messages dataset
     messages = pd.read_csv(messages_filepath)
+    print(messages.isnull().any(), 'check nulls in messages')
+    
     # load categories dataset
     categories = pd.read_csv(categories_filepath)
+    print(categories.isnull().any(), 'check nulls in cats')
     #  Merge datasets on ID
     df = messages.merge(categories, on = 'id')
     return df
@@ -117,4 +120,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
