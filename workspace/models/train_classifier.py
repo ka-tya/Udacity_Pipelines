@@ -1,3 +1,5 @@
+import sys
+import os
 import pandas as pd
 import numpy as np
 import string
@@ -5,25 +7,21 @@ from sqlalchemy import create_engine
 from nltk.tokenize import word_tokenize
 import nltk
 from nltk.corpus import stopwords as sw
-from nltk.corpus import wordnet as wn
 from nltk import WordNetLemmatizer
 from nltk import sent_tokenize
 from nltk import pos_tag
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('stopwords')
-nltk.download('wordnet')
 from sklearn.pipeline import Pipeline
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 import pickle
-
 
 def load_data(database_filepath, table_name='PreppedDataTable'):
     """Load cleaned data from database into dataframe.
@@ -43,7 +41,7 @@ def load_data(database_filepath, table_name='PreppedDataTable'):
 
     return X, y, category_names
 
-ef tokenize(text, lemmatizer = WordNetLemmatizer()):
+def tokenize(text, lemmatizer = WordNetLemmatizer()):
         """
         Returns a normalized, lemmatized list of tokens from a document by
         applying segmentation (breaking into sentences), then word/punctuation
@@ -72,24 +70,23 @@ ef tokenize(text, lemmatizer = WordNetLemmatizer()):
         return tokens
 
 def build_model():
-   ''''
-   This machine pipeline should take in the `message` column as input and output classification results on the other 36 categories in the dataset. You may find the [MultiOutputClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.multioutput.MultiOutputClassifier.html) helpful for predicting multiple target variables.
-
-   ''''
-   pipeline= Pipeline([
+    """
+    This machine pipeline should take in the `message` column as input and output classification results on the other 36 categories      in the dataset. Y
+   
+    """
+    pipeline= Pipeline([
             ('vectorizer', CountVectorizer(tokenizer=tokenize)),
             ('tfidf', TfidfTransformer()),
             ('classifier', MultiOutputClassifier(KNeighborsClassifier(n_neighbors=3))),
         ])
-   parameters = {
-    'classifier__estimator__n_neighbors':list(range(3,10)),
+    parameters = {
+     'classifier__estimator__n_neighbors':list(range(3,15)), #I tested with 3-6
      'classifier__estimator__weights':['uniform', 'distance']}
 
-   cv = GridSearchCV(pipeline, param_grid=parameters, cv=2, n_jobs=-1, verbose=3)
-   return cv
+    cv = GridSearchCV(pipeline, param_grid=parameters, cv=2, n_jobs=-1, verbose=3)
+    return cv
 
-
-def evaluate_model(model, X_test, Y_test, category_names):
+def evaluate_model(model, X_test, Y_test,category_names):
     """Evaluate model
     Args:
         model: sklearn.model_selection.GridSearchCV.  It contains a sklearn estimator.
@@ -98,12 +95,11 @@ def evaluate_model(model, X_test, Y_test, category_names):
         category_names: Disaster category names.
     """
     y_pred = model.predict(X_test)
-
-    # Print accuracy, precision, recall and f1_score for each categories
-    i = 0
-    for item in Y_test.columns:
-        print(classification_report(Y_test[item],y_pred[:,i]))
-        i+=1
+    
+    #Print accuracy, precision, recall and f1_score for each categories
+    for i in range(y_pred.shape[1]):
+        print(category_names[i])
+        print(classification_report(Y_test[:,i],y_pred[:,i]))
 
 def save_model(model, model_filepath):
     """Save model
@@ -113,14 +109,13 @@ def save_model(model, model_filepath):
     """
     with open(model_filepath, 'wb') as file:
         pickle.dump(model, file)
-        
-        
+                
 def main():
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.8) #even with 50/50 runs over 5 hrs
         
         print('Building model...')
         model = build_model()
