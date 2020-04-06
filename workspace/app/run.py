@@ -9,37 +9,68 @@ from flask import Flask
 from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
 from sklearn.externals import joblib
-from sklearn.feature_extraction.text import CountVectorizer
 from sqlalchemy import create_engine
 
 
 app = Flask(__name__)
 
 def tokenize(text):
-    tokens = []
+    tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 
-    for sent in sent_tokenize(text):
-            # Break the sentence into part of speech tagged tokens
-            for token, tag in pos_tag(word_tokenize(sent)):
-                # Apply preprocessing to the token
-                token = token.lower() 
-                token = token.strip()
-                token = token.strip('_')
-                token = token.strip('*')
+    clean_tokens = []
+    for tok in tokens:
+        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+        clean_tokens.append(clean_tok)
 
-                # If punctuation or stopword, ignore token and continue
-                if token in set(sw.words('english')) or all(char in string.punctuation for char in token):
-                    continue
-                
-                tokens.append(token)
-        # Lemmatize the token and yield
-        tokens = [lemmatizer.lemmatize(t) for t in tokens]
-        return tokens
+    return clean_tokens
 
-# load data from database
-engine = create_engine('sqlite:///../data/DisasterResponse.db')
-df = pd.read_sql_table('CleanedTableName', engine)
+# load data
+engine = create_engine('sqlite:///data/DisasterResponse.db')
+df = pd.read_sql_table('PreppedDataTable', engine)
+
+
+# load model
+model = joblib.load("../workspace/models/classifier.pkl")
+
+
+#index webpage displays cool visuals and receives user input text for mode# @app.route(')
+@app.route('/inx')
+def index():
+    
+    # extract data needed fovisuals
+    # TODO: Below is an example - modify to extract data for your n visuals
+    genre_counts = df.groupby('genre').message.count()
+    genre_names = list(genre_counts.index)   
+    #create visuals
+    # TODO: Below is an example - modify to crea your own visls
+    graphs = [
+         { 'data': [
+                Bar(
+                  x=genre_names,
+                  y =genre_counts
+              )
+          ],
+
+            'layout': {
+                'title': 'Distribution of Messe Genres',
+                'yaxis': {
+                  'title': "Count"
+              },
+                 'xaxis': {
+                 'title': "Genre"
+              }
+            }
+      }
+    ]
+    
+    # encode plotly graphs in JSON
+    ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
+    graphJS= json.dumps(graphs, cls=plotly.utils.PtlyJSONEncoder)
+    
+    # render web page with plotly graphs
+    return render_template('master.html', ids=ids, graphJSON=graphJS)
+
 
 # web page that handles user query and displays model results
 @app.route('/go')
@@ -57,7 +88,6 @@ def go():
         query=query,
         classification_result=classification_results
     )
-
 
 def main():
     app.run(host='0.0.0.0', port=3001, debug=True)
