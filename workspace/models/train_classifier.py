@@ -20,6 +20,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 import pickle
+import re
 # load messages dataset
 def load_data(database_filepath, table_name='PreppedDataTable'):
     """Load cleaned data from database into dataframe.
