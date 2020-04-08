@@ -33,6 +33,7 @@ ________________________________________________________________________________
 - ML Pipeline Preparation.ipynb: Description for workspace/model/train_classifier.py
 
 ##### workspace/data/process_data.py: A script that preps and stores the data through the following steps:
+Detailed instructions are available within the README file inside workspace folder
 * Load the messages and categories datasets
 * Clean the data
 * Store output in a database
