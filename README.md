@@ -12,7 +12,7 @@ The raw text supplied to the tool is cleaned, normalized and tokenzed by breakin
 
 ### Pipelines 
 To create a clean and reusable solution a pipeline is created. Pipelines are powerful helper of python science package sk-learn.
-It helps chain multiple steps together and have a clean reusable peace of code to simplify a search for the best machine learning algorythm.
+It helps chain multiple steps together and have a clean reusable peace of code to simplify a search for the best machine learning algorithm.
 
 ### Web App
 Finally to simplify the user experience even further, a web app is created to automate the run of the solution.
